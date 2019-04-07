@@ -27,4 +27,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 //    implementation project(':imagecompress')
     implementation 'top.zibin:Luban:1.1.8'
+    implementation 'com.parting_soul.imagecompress:imageCompress:1.0'
 }
