@@ -3,6 +3,8 @@ package com.parting_soul.imagecompressdemo;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,6 +20,7 @@ import com.parting_soul.imagecompress.core.CompressConfig;
 import com.parting_soul.imagecompress.core.IImageCompress;
 import com.parting_soul.imagecompress.core.ImageCompressManager;
 import com.parting_soul.imagecompress.utils.Constants;
+import com.parting_soul.imagecompress.utils.ImageProcessManager;
 import com.parting_soul.imagecompressdemo.imgpicker.PicturePickDialog;
 
 import java.io.File;
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private ArrayList<Photo> mImgLists;
     private CompositeCompress mCompositeCompress = new CompositeCompress();
+    private ImageProcessManager mImageProcessManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x12);
         mImgLists = new ArrayList<>();
+        mImageProcessManager = new ImageProcessManager();
     }
 
     @Override
@@ -62,9 +67,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.bt_luban_compress:
                 compressByLuban();
                 break;
+            case R.id.bt_compress_network_img:
+                compressNetworkImage();
+                break;
+            case R.id.bt_compress_bitmap:
+                compressBitmap();
+                break;
             default:
                 break;
         }
+    }
+
+    private void compressBitmap() {
+        PicturePickDialog dialog = new PicturePickDialog(this);
+        dialog.setOnGetPictureCallback(new PicturePickDialog.OnGetPictureCallback() {
+            @Override
+            public void onResult(String fileName) {
+                Bitmap bitmap = BitmapFactory.decodeFile(fileName);
+                mImageProcessManager.getImageFilePath(bitmap, new ImageProcessManager.OnGetImageFileCallback() {
+                    @Override
+                    public void onSuccess(String filePath) {
+                        LogUtils.d("" + filePath);
+                        showToast("图片转换完成");
+                    }
+
+                    @Override
+                    public void onError() {
+                        LogUtils.e("");
+                    }
+                });
+            }
+        });
+        dialog.show();
+    }
+
+    private void compressNetworkImage() {
+        mImageProcessManager.getImageFilePath("http://pic.ecook.cn/web/6669742.jpg!m720", new ImageProcessManager.OnGetImageFileCallback() {
+            @Override
+            public void onSuccess(String filePath) {
+                LogUtils.d("" + filePath);
+                showToast("图片下载完成");
+            }
+
+            @Override
+            public void onError() {
+                LogUtils.e("");
+            }
+        });
     }
 
     private void compressByLuban() {
@@ -276,6 +325,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mImageProcessManager.onDestroy();
         mCompositeCompress.destroy();
     }
 }

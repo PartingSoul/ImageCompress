@@ -3,6 +3,7 @@
     package="com.parting_soul.imagecompressdemo">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name="com.parting_soul.imagecompressdemo.App"
