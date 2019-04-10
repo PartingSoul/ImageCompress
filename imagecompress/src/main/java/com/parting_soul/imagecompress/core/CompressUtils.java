@@ -28,6 +28,7 @@ public class CompressUtils {
     private Handler mHandler;
     private CompressConfig mCompressConfig;
 
+
     public CompressUtils(CompressConfig config) {
         this.mHandler = new Handler();
         this.mCompressConfig = config;
@@ -72,7 +73,7 @@ public class CompressUtils {
 
         //旋转对应的角度，方式图片压缩后JPEG头部丢失图片信息
         sourceBitmap = rotateImage(getImageRotateDegree(sourcePath), sourceBitmap);
-        
+
         int quality = 100;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         sourceBitmap.compress(Bitmap.CompressFormat.JPEG, quality, bos);

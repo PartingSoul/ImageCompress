@@ -1,6 +1,8 @@
 package com.parting_soul.imagecompress.core;
 
-import com.parting_soul.imagecompress.utils.Constants;
+import android.content.Context;
+
+import com.parting_soul.imagecompress.utils.FilePath;
 
 /**
  * 图片压缩配置
@@ -33,10 +35,14 @@ public class CompressConfig {
     /**
      * 压缩后缓存图片目录，非文件路径(全路径)
      */
-    private String cacheDir = Constants.CACHE_PATH_COMPRESS_IMG;
+    private String cacheDir;
+
+    private Context mContext;
 
 
-    private CompressConfig() {
+    private CompressConfig(Context context) {
+        this.mContext = context;
+        this.cacheDir = FilePath.getFileDirPath(context);
     }
 
     public String getCacheDir() {
@@ -59,11 +65,15 @@ public class CompressConfig {
         return maxPixel;
     }
 
+    public Context getContext() {
+        return mContext;
+    }
+
     public static class Builder {
         private CompressConfig config;
 
-        public Builder() {
-            this.config = new CompressConfig();
+        public Builder(Context context) {
+            this.config = new CompressConfig(context);
         }
 
         /**

@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release' // 新增
 
-def libraryVersion = "1.0"
+def libraryVersion = "1.0.2"
 
 android {
     compileSdkVersion 28

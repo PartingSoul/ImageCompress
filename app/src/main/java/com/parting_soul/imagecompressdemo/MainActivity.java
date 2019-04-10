@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<Photo> mImgLists;
     private CompositeCompress mCompositeCompress = new CompositeCompress();
     private ImageProcessManager mImageProcessManager;
+    private List<String> mCacheFileLists;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x12);
         mImgLists = new ArrayList<>();
-        mImageProcessManager = new ImageProcessManager();
+        mImageProcessManager = new ImageProcessManager(this);
+        mCacheFileLists = new ArrayList<>();
     }
 
     @Override
@@ -82,31 +85,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PicturePickDialog dialog = new PicturePickDialog(this);
         dialog.setOnGetPictureCallback(new PicturePickDialog.OnGetPictureCallback() {
             @Override
-            public void onResult(String fileName) {
+            public void onResult(final String fileName) {
                 Bitmap bitmap = BitmapFactory.decodeFile(fileName);
                 mImageProcessManager.getImageFilePath(bitmap, new ImageProcessManager.OnGetImageFileCallback() {
                     @Override
                     public void onSuccess(String filePath) {
                         LogUtils.d("" + filePath);
                         showToast("图片转换完成");
+                        mCacheFileLists.add(fileName);
                     }
 
                     @Override
                     public void onError() {
                         LogUtils.e("");
                     }
-                });
+                }, true);
             }
         });
         dialog.show();
     }
 
     private void compressNetworkImage() {
-        mImageProcessManager.getImageFilePath("http://pic.ecook.cn/web/6669742.jpg!m720", new ImageProcessManager.OnGetImageFileCallback() {
+        File outFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "info.jpg");
+        mImageProcessManager.getImageFilePath("http://pic.ecook.cn/web/6669742.jpg!m720", outFile, new ImageProcessManager.OnGetImageFileCallback() {
             @Override
             public void onSuccess(String filePath) {
                 LogUtils.d("" + filePath);
                 showToast("图片下载完成");
+                mCacheFileLists.add(filePath);
             }
 
             @Override
@@ -167,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void compressFrame() {
         List<Photo> lists = getPhotoLists();
         final ProgressDialog dialog = new ProgressDialog(this);
-        ImageCompressManager.builder(lists, new CompressConfig.Builder().create(),
+        ImageCompressManager.builder(lists, new CompressConfig.Builder(this).create(),
                 new IImageCompress.OnCompressResultCallback() {
 
                     @Override
@@ -327,5 +333,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
         mImageProcessManager.onDestroy();
         mCompositeCompress.destroy();
+        clearFileCache();
     }
+
+    private void clearFileCache() {
+        for (String path : mCacheFileLists) {
+            File file = new File(path);
+            if (file.exists()) {
+                LogUtils.d("" + file.delete());
+            }
+        }
+    }
+
 }

@@ -16,7 +16,7 @@ implementation 'com.parting_soul.imagecompress:imageCompress:1.0'
 #### 3. 使用方式
 
 ```java
-ImageCompressManager.builder(lists, new CompressConfig.Builder().create(),
+ImageCompressManager.builder(lists, new CompressConfig.Builder(this).create(),
     new IImageCompress.OnCompressResultCallback() {
 
         @Override
