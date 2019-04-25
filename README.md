@@ -10,7 +10,7 @@
 #### 2. 导入依赖
 
 ```groovy
-implementation 'com.parting_soul.imagecompress:imageCompress:1.0'
+implementation 'com.parting_soul.imagecompress:imageCompress:1.0.2'
 ```
 
 #### 3. 使用方式
